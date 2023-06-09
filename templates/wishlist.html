@@ -1,0 +1,81 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    index
+{% endblock %}
+
+{% block main %}
+    <table>
+        <thead>
+            <tr>
+                <th>Movie Name</th>
+                <th>Release Year</th>
+                <th>Genre</th>
+                <th>Director</th>
+                <th>Language</th>
+                <th>Box Office</th>
+                <th>IMDb Rating</th>
+                <th>Comments</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- TODO: Loop through the database entries to display them in this table -->
+            {% for record in wishlist %}
+                <form action="/wishlist" method="POST">
+                    <tr>
+                        <td>{{ record.movie_id }}</td>
+                        <input type="hidden" name="movie_id" value="{{ record.movie_id }}" />
+                        <td>{{ record.year }}</td>
+                        <input type="hidden" name="year" value="{{ record.year }}" />
+                        <td>{{ record.genre }}</td>
+                        <input type="hidden" name="genre" value="{{ record.genre }}" />
+                        <td>{{ record.director }}</td>
+                        <input type="hidden" name="director" value="{{ record.director }}" />
+                        <td>{{ record.language }}</td>
+                        <input type="hidden" name="language" value="{{ record.language }}" />
+                        <td>{{ record.boxoffice }}</td>
+                        <input type="hidden" name="boxoffice" value="{{ record.boxoffice }}" />
+                        <td>{{ record.imdb_rating }}</td>
+                        <input type="hidden" name="imdb_rating" value="{{ record.imdb_rating }}" />
+                        <td>{{ record.comments }}</td>
+                        <td>
+                            <button class="btn btn-primary" name="delete" type="submit">Delete</button>
+                        </td>
+                        <td>
+                            <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#watch-history">Add to Watch history</button>
+                        </td>
+                    </tr>
+                    <!-- Modal -->
+                    <div class="modal fade" id="watch-history" tabindex="-1" aria-labelledby="watch-historyLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h5 class="modal-title" id="exampleModalLabel">Add Details</h5>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label for="watchdate">Watch Date</label>
+                                    <input id="watchdate" class="form-control" type="date" name="watchdate" />
+                                </div>
+                                <div class="mb-3">
+                                    <label for="personal-rating" class="col-form-label">Personal Rating:</label>
+                                    <input autocomplete="off" type="text" class="form-control mx-auto w-auto" id="personal-rating" name="personal_rating" placeholder="Personal Rating(0 - 10))">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="comments" class="col-form-label">Comments:</label>
+                                    <textarea class="form-control" id="comments" name="comments"></textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button class="btn btn-primary" name="add_to_history" type="submit">Add to Watch History</button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                </form>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

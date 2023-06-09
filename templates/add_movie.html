@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    add_movie
+{% endblock %}
+
+{% block main %}
+    <form action="/add_movie" method="post">
+        <div class="mb-3">
+            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="title" name="title" placeholder="Title" type="text">
+        </div>
+        <div class="mb-3">
+            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="personal_rating" name="personal_rating" placeholder="Personal Rating(0 - 10))" type="text">
+        </div>
+        <button class="btn btn-primary" type="submit">Add to Record</button>
+    </form>
+{% endblock %}

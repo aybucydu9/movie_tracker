@@ -1,0 +1,102 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    search_results
+{% endblock %}
+
+{% block main %}
+    <img class="border img-fluid" src={{ poster }}>
+    <form action="/search" method="post">
+        <table>
+            <thead>
+                <tr>
+                    <th>Movie Name</th>
+                    <th>Year</th>
+                    <th>Genre</th>
+                    <th>Direcotr</th>
+                    <th>Language</th>
+                    <th>IMDb Rating</th>
+                    <th>BoxOffice</th>
+                </tr>
+            </thead>
+            <tbody>
+                    <tr>
+                        <td>{{ title }}</td>
+                        <input type="hidden" name="title" value="{{ title }}" />
+                        <td>{{ year }}</td>
+                        <input type="hidden" name="year" value="{{ year }}" />
+                        <td>{{ genre }}</td>
+                        <input type="hidden" name="genre" value="{{ genre }}" />
+                        <td>{{ director }}</td>
+                        <input type="hidden" name="director" value="{{ director }}" />
+                        <td>{{ language }}</td>
+                        <input type="hidden" name="language" value="{{ language }}" />
+                        <td>{{ imdb_rating }}</td>
+                        <input type="hidden" name="imdb_rating" value="{{ imdb_rating }}" />
+                        <td>{{ boxoffice }}</td>
+                        <input type="hidden" name="boxoffice" value="{{ boxoffice }}" />
+                    </tr>
+            </tbody>
+        </table>
+        <button class="btn btn-primary" name="search_again" type="submit">Search for Another Movie</button>
+        <!-- Button trigger modal -->
+        <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#watch-history">
+            Add to Watch History
+        </button>
+        <!-- Modal -->
+        <div class="modal fade" id="watch-history" tabindex="-1" aria-labelledby="watch-historyLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLabel">Add Details</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="watchdate">Watch Date</label>
+                        <input id="watchdate" class="form-control" type="date" name="watchdate" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="personal-rating" class="col-form-label">Personal Rating:</label>
+                        <input autocomplete="off" type="text" class="form-control mx-auto w-auto" id="personal-rating" name="personal_rating" placeholder="Personal Rating(0 - 10))">
+                    </div>
+                    <div class="mb-3">
+                        <label for="comments" class="col-form-label">Comments:</label>
+                        <textarea class="form-control" id="comments" name="comments"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button class="btn btn-primary" name="add_to_history" type="submit">Add to Watch History</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#wishlist">
+            Add to Wishlist
+        </button>
+        <!-- Modal -->
+        <div class="modal fade" id="wishlist" tabindex="-1" aria-labelledby="wishlistLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLabel">Add Details</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="comments" class="col-form-label">Comments:</label>
+                        <textarea class="form-control" id="comments" name="wishlist_comment"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button class="btn btn-primary" name="add_to_wishlist" type="submit">Add to Wishlist</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+    </form>
+{% endblock %}
+

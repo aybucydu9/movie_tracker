@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    index
+{% endblock %}
+
+{% block main %}
+    <table>
+        <thead>
+            <tr>
+                <th>Watch Date</th>
+                <th>Movie Name</th>
+                <th>Release Year</th>
+                <th>Genre</th>
+                <th>Director</th>
+                <th>Language</th>
+                <th>Box Office</th>
+                <th>IMDb Rating</th>
+                <th>Personal Rating</th>
+                <th>Comments</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- TODO: Loop through the database entries to display them in this table -->
+            {% for trx in history %}
+                <form action="/history" method="post">
+                    <tr>
+                        <td>{{ trx.date }}</td>
+                        <input type="hidden" name="date" value="{{ trx.date }}" />
+                        <td>{{ trx.movie_id }}</td>
+                        <input type="hidden" name="movie_id" value="{{ trx.movie_id }}" />
+                        <td>{{ trx.year }}</td>
+                        <td>{{ trx.genre }}</td>
+                        <td>{{ trx.director }}</td>
+                        <td>{{ trx.language }}</td>
+                        <td>{{ trx.boxoffice }}</td>
+                        <td>{{ trx.imdb_rating }}</td>
+                        <td>{{ trx.personal_rating }}</td>
+                        <td>{{ trx.comments }}</td>
+                        <td>
+                            <button class="btn btn-primary" name="delete" type="submit">delete</button>
+                        </td>
+                    </tr>
+                </form>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
