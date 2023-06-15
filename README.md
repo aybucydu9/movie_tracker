@@ -1,5 +1,4 @@
 # My Movies
-### Video Demo:  <URL HERE>
 ## Description:
 This is a website to help user record the movies they have watched (watch history) and the ones they want to watch (wishlist).
 
