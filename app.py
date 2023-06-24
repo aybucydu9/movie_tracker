@@ -28,7 +28,7 @@ Session(app)
 #app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///movies_sqlite.db"
 
 # v2: Config for Heroku
-app.config["SQLALCHEMY_DATABASE_URI"] = "postgres://ritqmqntbuvudy:c41f1a4b23aac824e7c1f2e132a85ef27be88c398d5e19ab800b5d9843c10d87@ec2-3-234-204-26.compute-1.amazonaws.com:5432/d20p1ocvl4g751"
+app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://ritqmqntbuvudy:c41f1a4b23aac824e7c1f2e132a85ef27be88c398d5e19ab800b5d9843c10d87@ec2-3-234-204-26.compute-1.amazonaws.com:5432/d20p1ocvl4g751"
 
 db = SQLAlchemy(app)
 
