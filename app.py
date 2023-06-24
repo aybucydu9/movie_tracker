@@ -63,7 +63,6 @@ class Wishlist(db.Model):
     imdb_rating = db.Column(db.Float)
     boxoffice = db.Column(db.String(200))
 
-# # TODO: to figure out what to do with this
 # with app.app_context():
 #     db.create_all()
 
@@ -265,6 +264,19 @@ def wishlist():
             # if len(record) == 1:
             #     return apology("This watch history already recorded")
 
+            # Update movies table
+            # check if movie already exist in movies table
+            rows = Movies.query.filter_by(movie_id=request.form.get("movie_id")).first()
+            if rows is None:
+                # if not add the movie to movies table
+                movies = Movies(movie_id=request.form.get("movie_id"),
+                                year = request.form.get("year"), 
+                                genre=request.form.get("genre"),
+                                director = request.form.get("director"),
+                                language = request.form.get("language"))
+                db.session.add(movies)
+                db.session.commit()
+
             # Update watch history
             movie_watched = Watch_history(user_id=session["user_id"], 
                                           movie_id = request.form.get("movie_id"), 
@@ -278,18 +290,7 @@ def wishlist():
             # db.execute("INSERT INTO watch_history (user_id, movie_id, watch_date, personal_rating, comments, imdb_rating, boxoffice) VALUES(?, ?, ?, ?, ?, ?, ?)",
             #     session["user_id"], request.form.get("movie_id"), request.form.get("watchdate"), rating, request.form.get("comments"),request.form.get("imdb_rating"), request.form.get("boxoffice"))
 
-            # Update movies table
-            # check if movie already exist in movies table
-            rows = Movies.query.filter_by(movie_id=request.form.get("movie_id")).first()
-            if rows is None:
-                # if not add the movie to movies table
-                movies = Movies(movie_id=request.form.get("movie_id"),
-                                year = request.form.get("year"), 
-                                genre=request.form.get("genre"),
-                                director = request.form.get("director"),
-                                language = request.form.get("language"))
-                db.session.add(movies)
-                db.session.commit()
+            
 
             # rows = db.execute("SELECT * FROM movies where movie_id = ?", request.form.get("movie_id"))
             # if len(rows) != 1:
@@ -412,13 +413,26 @@ def search():
             #return redirect("/")
             return redirect("/history")
 
-        # User request to add the movie to wishlist #TODO
+        # User request to add the movie to wishlist
         if "add_to_wishlist" in request.form:
             # If movie already exist in wishlist
             #rows = db.execute("SELECT * FROM wishlist where movie_id = ?", request.form.get("title"))
             rows = Wishlist.query.filter_by(user_id=session["user_id"], movie_id=request.form.get("title")).first()
             if rows is not None:
                 return apology("movie already in wishlist")
+
+            # Update movies table
+            # check if movie already exist in movies table
+            rows = Movies.query.filter_by(movie_id=request.form.get("title")).first()
+            if rows is None:
+                # if not add the movie to movies table
+                movies = Movies(movie_id=request.form.get("title"),
+                                year = request.form.get("year"), 
+                                genre=request.form.get("genre"),
+                                director = request.form.get("director"),
+                                language = request.form.get("language"))
+                db.session.add(movies)
+                db.session.commit()
 
             # Update wishlist
             # Future enhancement: get rid of imdb_rating and boxoffice in wishlist table
@@ -432,18 +446,6 @@ def search():
             db.session.add(add_to_wishlist)
             db.session.commit()
             
-            # Update movies table
-            # check if movie already exist in movies table
-            rows = Movies.query.filter_by(movie_id=request.form.get("title")).first()
-            if rows is None:
-                # if not add the movie to movies table
-                movies = Movies(movie_id=request.form.get("title"),
-                                year = request.form.get("year"), 
-                                genre=request.form.get("genre"),
-                                director = request.form.get("director"),
-                                language = request.form.get("language"))
-                db.session.add(movies)
-                db.session.commit()
             # rows = db.execute("SELECT * FROM movies where movie_id = ?", request.form.get("title"))
             # if len(rows) != 1:
             #     # if not add the movie to movies table
