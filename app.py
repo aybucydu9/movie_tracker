@@ -20,10 +20,10 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 # v1: Configure SQLlite DB
-#app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///movies_sqlite.db"
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///movies_sqlite.db"
 
 # v2: Config for Heroku
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ['POSTGRESQL_URL']
+#app.config["SQLALCHEMY_DATABASE_URI"] = os.environ['POSTGRESQL_URL']
 
 db = SQLAlchemy(app)
 
@@ -59,8 +59,8 @@ class Wishlist(db.Model):
     boxoffice = db.Column(db.String(200))
 
 # v1: SQLlite DB create tables
-# with app.app_context():
-#     db.create_all()
+with app.app_context():
+    db.create_all()
 
 # Make sure API key is set
 if not os.environ.get("API_KEY"):

@@ -7,7 +7,7 @@
 {% block main %}
     <img class="border img-fluid" src={{ poster }}>
     <form action="/search" method="post">
-        <table>
+        <table class="table table-sm">
             <thead>
                 <tr>
                     <th>Movie Name</th>
@@ -21,26 +21,26 @@
             </thead>
             <tbody>
                     <tr>
-                        <td>{{ title }}</td>
+                        <td class="align-middle">{{ title }}</td>
                         <input type="hidden" name="title" value="{{ title }}" />
-                        <td>{{ year }}</td>
+                        <td class="align-middle">{{ year }}</td>
                         <input type="hidden" name="year" value="{{ year }}" />
-                        <td>{{ genre }}</td>
+                        <td class="align-middle">{{ genre }}</td>
                         <input type="hidden" name="genre" value="{{ genre }}" />
-                        <td>{{ director }}</td>
+                        <td class="align-middle">{{ director }}</td>
                         <input type="hidden" name="director" value="{{ director }}" />
-                        <td>{{ language }}</td>
+                        <td class="align-middle">{{ language }}</td>
                         <input type="hidden" name="language" value="{{ language }}" />
-                        <td>{{ imdb_rating }}</td>
+                        <td class="align-middle">{{ imdb_rating }}</td>
                         <input type="hidden" name="imdb_rating" value="{{ imdb_rating }}" />
-                        <td>{{ boxoffice }}</td>
+                        <td class="align-middle">{{ boxoffice }}</td>
                         <input type="hidden" name="boxoffice" value="{{ boxoffice }}" />
                     </tr>
             </tbody>
         </table>
-        <button class="btn btn-primary" name="search_again" type="submit">Search for Another Movie</button>
+        <button class="btn btn-primary me-5" name="search_again" type="submit">Search for Another Movie</button>
         <!-- Button trigger modal -->
-        <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#watch-history">
+        <button class="btn btn-warning me-5" type="button" data-bs-toggle="modal" data-bs-target="#watch-history">
             Add to Watch History
         </button>
         <!-- Modal -->
@@ -72,7 +72,7 @@
               </div>
             </div>
           </div>
-        <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#wishlist">
+        <button class="btn btn-secondary" type="button" data-bs-toggle="modal" data-bs-target="#wishlist">
             Add to Wishlist
         </button>
         <!-- Modal -->

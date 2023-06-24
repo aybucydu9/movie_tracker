@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block main %}
-    <table>
+    <table class="table table-sm">
         <thead>
             <tr>
                 <th>Watch Date</th>
@@ -25,20 +25,20 @@
             {% for trx in history %}
                 <form action="/history" method="post">
                     <tr>
-                        <td>{{ trx.date }}</td>
+                        <td class="align-middle">{{ trx.date }}</td>
                         <input type="hidden" name="date" value="{{ trx.date }}" />
-                        <td>{{ trx.movie_id }}</td>
+                        <td class="align-middle">{{ trx.movie_id }}</td>
                         <input type="hidden" name="movie_id" value="{{ trx.movie_id }}" />
-                        <td>{{ trx.year }}</td>
-                        <td>{{ trx.genre }}</td>
-                        <td>{{ trx.director }}</td>
-                        <td>{{ trx.language }}</td>
-                        <td>{{ trx.boxoffice }}</td>
-                        <td>{{ trx.imdb_rating }}</td>
-                        <td>{{ trx.personal_rating }}</td>
-                        <td>{{ trx.comments }}</td>
-                        <td>
-                            <button class="btn btn-primary" name="delete" type="submit">Delete</button>
+                        <td class="align-middle">{{ trx.year }}</td>
+                        <td class="align-middle">{{ trx.genre }}</td>
+                        <td class="align-middle">{{ trx.director }}</td>
+                        <td class="align-middle">{{ trx.language }}</td>
+                        <td class="align-middle">{{ trx.boxoffice }}</td>
+                        <td class="align-middle">{{ trx.imdb_rating }}</td>
+                        <td class="align-middle">{{ trx.personal_rating }}</td>
+                        <td class="align-middle">{{ trx.comments }}</td>
+                        <td class="align-middle">
+                            <button class="btn btn-dark btn-sm" name="delete" type="submit">Delete</button>
                         </td>
                     </tr>
                 </form>

@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block main %}
-    <table>
+    <table class="table table-sm">
         <thead>
             <tr>
                 <th>Movie Name</th>
@@ -23,26 +23,26 @@
             {% for record in wishlist %}
                 <form action="/wishlist" method="POST">
                     <tr>
-                        <td>{{ record.movie_id }}</td>
+                        <td class="align-middle">{{ record.movie_id }}</td>
                         <input type="hidden" name="movie_id" value="{{ record.movie_id }}" />
-                        <td>{{ record.year }}</td>
+                        <td class="align-middle">{{ record.year }}</td>
                         <input type="hidden" name="year" value="{{ record.year }}" />
-                        <td>{{ record.genre }}</td>
+                        <td class="align-middle">{{ record.genre }}</td>
                         <input type="hidden" name="genre" value="{{ record.genre }}" />
-                        <td>{{ record.director }}</td>
+                        <td class="align-middle">{{ record.director }}</td>
                         <input type="hidden" name="director" value="{{ record.director }}" />
-                        <td>{{ record.language }}</td>
+                        <td class="align-middle">{{ record.language }}</td>
                         <input type="hidden" name="language" value="{{ record.language }}" />
-                        <td>{{ record.boxoffice }}</td>
+                        <td class="align-middle">{{ record.boxoffice }}</td>
                         <input type="hidden" name="boxoffice" value="{{ record.boxoffice }}" />
-                        <td>{{ record.imdb_rating }}</td>
+                        <td class="align-middle">{{ record.imdb_rating }}</td>
                         <input type="hidden" name="imdb_rating" value="{{ record.imdb_rating }}" />
-                        <td>{{ record.comments }}</td>
-                        <td>
-                            <button class="btn btn-primary" name="delete" type="submit">Delete</button>
+                        <td class="align-middle">{{ record.comments }}</td>
+                        <td class="align-middle">
+                            <button class="btn btn-warning btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#watch-history">Move to Watch History</button>
                         </td>
-                        <td>
-                            <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#watch-history">Move to Watch History</button>
+                        <td class="align-middle">
+                            <button class="btn btn-dark btn-sm" name="delete" type="submit">Delete</button>
                         </td>
                     </tr>
                     <!-- Modal -->
