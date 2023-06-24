@@ -25,7 +25,10 @@ Session(app)
 # db = SQL("sqlite:///movie.db")
 
 # v1: Configure SQLlite DB
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///movies_sqlite.db"
+#app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///movies_sqlite.db"
+
+# v2: Config for Heroku
+app.config["SQLALCHEMY_DATABASE_URI"] = "postgres://ritqmqntbuvudy:c41f1a4b23aac824e7c1f2e132a85ef27be88c398d5e19ab800b5d9843c10d87@ec2-3-234-204-26.compute-1.amazonaws.com:5432/d20p1ocvl4g751"
 
 db = SQLAlchemy(app)
 
@@ -49,20 +52,20 @@ class Watch_history(db.Model):
     movie_id = db.Column(db.String(200), db.ForeignKey("movies.movie_id"), primary_key=True)
     watch_date = db.Column(db.Date, primary_key=True)
     personal_rating = db.Column(db.Float)
-    comments = db.Column(db.String(2000))
+    comments = db.Column(db.Text())
     imdb_rating = db.Column(db.Float)
     boxoffice = db.Column(db.String(200))
 
 class Wishlist(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), primary_key=True)
     movie_id = db.Column(db.String(200), db.ForeignKey("movies.movie_id"), primary_key=True)
-    comments = db.Column(db.String(2000))
+    comments = db.Column(db.Text())
     imdb_rating = db.Column(db.Float)
     boxoffice = db.Column(db.String(200))
 
-# TODO: to figure out what to do with this
-with app.app_context():
-    db.create_all()
+# # TODO: to figure out what to do with this
+# with app.app_context():
+#     db.create_all()
 
 # Make sure API key is set
 if not os.environ.get("API_KEY"):
