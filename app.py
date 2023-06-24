@@ -234,8 +234,6 @@ def wishlist():
                                              movie_id=request.form.get("movie_id")).first()
             db.session.delete(query)
             db.session.commit()
-            # db.execute("DELETE FROM wishlist WHERE user_id = ? and movie_id = ?",
-            #     session["user_id"], request.form.get("movie_id"))
         if "add_to_history" in request.form:
             # Ensure watch date is not null
             if not request.form.get("watchdate"):
@@ -257,10 +255,6 @@ def wishlist():
             record = Watch_history.query.filter_by(user_id=session["user_id"], movie_id=request.form.get("title"), watch_date=request.form.get("watchdate")).first()
             if record is not None:
                 return apology("This watch history has already been recorded")
-            # record = db.execute("SELECT * FROM watch_history where user_id = ? and movie_id = ? and watch_date = ?",
-            # session["user_id"], request.form.get("movie_id"),  request.form.get("watchdate"))
-            # if len(record) == 1:
-            #     return apology("This watch history already recorded")
 
             # Update movies table
             # check if movie already exist in movies table
@@ -285,20 +279,9 @@ def wishlist():
                                           boxoffice=request.form.get("boxoffice"))
             db.session.add(movie_watched)
             db.session.commit()
-            # db.execute("INSERT INTO watch_history (user_id, movie_id, watch_date, personal_rating, comments, imdb_rating, boxoffice) VALUES(?, ?, ?, ?, ?, ?, ?)",
-            #     session["user_id"], request.form.get("movie_id"), request.form.get("watchdate"), rating, request.form.get("comments"),request.form.get("imdb_rating"), request.form.get("boxoffice"))
 
             
-
-            # rows = db.execute("SELECT * FROM movies where movie_id = ?", request.form.get("movie_id"))
-            # if len(rows) != 1:
-            #     # if not add the movie to movies table
-            #     db.execute("INSERT INTO movies (movie_id, year, genre, director, language) VALUES(?, ?, ?, ?, ?)",
-            #         request.form.get("movie_id"), request.form.get("year"), request.form.get("genre"), request.form.get("director"), request.form.get("language"))
-
             # Update wishlist table
-            # db.execute("DELETE FROM wishlist WHERE user_id = ? and movie_id = ?",
-            #     session["user_id"], request.form.get("movie_id"))
             query = Wishlist.query.filter_by(user_id=session["user_id"], 
                                              movie_id=request.form.get("movie_id")).first()
             db.session.delete(query)
@@ -309,18 +292,6 @@ def wishlist():
 
 
     """Show record of wishlist"""
-    # wishlist = list()
-    # rows = db.execute("SELECT wishlist.movie_id, year, genre, director, language, boxoffice, imdb_rating, comments FROM wishlist join movies on wishlist.movie_id = movies.movie_id where user_id = ?", session["user_id"])
-    # for i in range(len(rows)):
-    #     wishlist.append({"movie_id": rows[i]["movie_id"], 
-    #                      "year": rows[i]["year"],
-    #                      "genre": rows[i]["genre"],
-    #         "director": rows[i]["director"],
-    #         "language": rows[i]["language"],
-    #         "boxoffice": rows[i]["boxoffice"],
-    #         "imdb_rating": rows[i]["imdb_rating"], 
-    #         "comments": rows[i]["comments"]})
-    # return render_template("wishlist.html", wishlist=wishlist)
     wishlist_list = list()
     results = db.session.query(Movies, Wishlist).join(Wishlist).filter(Wishlist.user_id==session["user_id"]).all()
     for movies, wishlist in results:
@@ -396,8 +367,6 @@ def search():
                 db.session.commit()
 
             # Update watch history
-            #db.execute("INSERT INTO watch_history (user_id, movie_id, watch_date, personal_rating, comments, imdb_rating, boxoffice) VALUES(?, ?, ?, ?, ?, ?, ?)",
-             #   session["user_id"], request.form.get("title"), request.form.get("watchdate"), rating, request.form.get("comments"),request.form.get("imdb_rating"), request.form.get("boxoffice"))
             movie_watched = Watch_history(user_id=session["user_id"], 
                                           movie_id = request.form.get("title"), 
                                           watch_date=datetime.strptime(request.form.get("watchdate"), '%Y-%m-%d').date(), 
@@ -414,7 +383,6 @@ def search():
         # User request to add the movie to wishlist
         if "add_to_wishlist" in request.form:
             # If movie already exist in wishlist
-            #rows = db.execute("SELECT * FROM wishlist where movie_id = ?", request.form.get("title"))
             rows = Wishlist.query.filter_by(user_id=session["user_id"], movie_id=request.form.get("title")).first()
             if rows is not None:
                 return apology("movie already in wishlist")
@@ -434,8 +402,6 @@ def search():
 
             # Update wishlist
             # Future enhancement: get rid of imdb_rating and boxoffice in wishlist table
-            # db.execute("INSERT INTO wishlist (user_id, movie_id, comments, imdb_rating, boxoffice) VALUES(?, ?, ?, ?, ?)",
-            #     session["user_id"], request.form.get("title"), request.form.get("wishlist_comment"),request.form.get("imdb_rating"), request.form.get("boxoffice"))
             add_to_wishlist = Wishlist(user_id=session["user_id"], 
                                        movie_id = request.form.get("title"), 
                                        comments=request.form.get("comments"),
@@ -444,12 +410,6 @@ def search():
             db.session.add(add_to_wishlist)
             db.session.commit()
             
-            # rows = db.execute("SELECT * FROM movies where movie_id = ?", request.form.get("title"))
-            # if len(rows) != 1:
-            #     # if not add the movie to movies table
-            #     db.execute("INSERT INTO movies (movie_id, year, genre, director, language) VALUES(?, ?, ?, ?, ?)",
-            #         request.form.get("title"), request.form.get("year"), request.form.get("genre"), request.form.get("director"), request.form.get("language"))
-
             return redirect("/wishlist")
     else:
         return render_template("search.html")
