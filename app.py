@@ -383,20 +383,6 @@ def search():
             if record is not None:
                 return apology("This watch history has already been recorded")
 
-            # Update watch history
-            #db.execute("INSERT INTO watch_history (user_id, movie_id, watch_date, personal_rating, comments, imdb_rating, boxoffice) VALUES(?, ?, ?, ?, ?, ?, ?)",
-             #   session["user_id"], request.form.get("title"), request.form.get("watchdate"), rating, request.form.get("comments"),request.form.get("imdb_rating"), request.form.get("boxoffice"))
-            movie_watched = Watch_history(user_id=session["user_id"], 
-                                          movie_id = request.form.get("title"), 
-                                          watch_date=datetime.strptime(request.form.get("watchdate"), '%Y-%m-%d').date(), 
-                                          personal_rating=rating, 
-                                          comments=request.form.get("comments"),
-                                          imdb_rating=request.form.get("imdb_rating"),
-                                          boxoffice=request.form.get("boxoffice"))
-            db.session.add(movie_watched)
-            db.session.commit()
-
-
             # Update movies table
             # check if movie already exist in movies table
             rows = Movies.query.filter_by(movie_id=request.form.get("title")).first()
@@ -409,6 +395,19 @@ def search():
                                 language = request.form.get("language"))
                 db.session.add(movies)
                 db.session.commit()
+
+            # Update watch history
+            #db.execute("INSERT INTO watch_history (user_id, movie_id, watch_date, personal_rating, comments, imdb_rating, boxoffice) VALUES(?, ?, ?, ?, ?, ?, ?)",
+             #   session["user_id"], request.form.get("title"), request.form.get("watchdate"), rating, request.form.get("comments"),request.form.get("imdb_rating"), request.form.get("boxoffice"))
+            movie_watched = Watch_history(user_id=session["user_id"], 
+                                          movie_id = request.form.get("title"), 
+                                          watch_date=datetime.strptime(request.form.get("watchdate"), '%Y-%m-%d').date(), 
+                                          personal_rating=rating, 
+                                          comments=request.form.get("comments"),
+                                          imdb_rating=request.form.get("imdb_rating"),
+                                          boxoffice=request.form.get("boxoffice"))
+            db.session.add(movie_watched)
+            db.session.commit()
 
             #return redirect("/")
             return redirect("/history")
