@@ -1,14 +1,12 @@
 import os
 
 from flask import Flask, flash, redirect, render_template, request, session
-#v0: from cs50 import SQL
-#v1: enhencement: 
 from flask_sqlalchemy import SQLAlchemy
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime, date
 
-from helper import apology, login_required, lookup#, usd
+from helper import apology, login_required, lookup
 
 # Configure application
 app = Flask(__name__)
@@ -20,9 +18,6 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
-
-# v0: Configure CS50 Library to use SQLite database
-# db = SQL("sqlite:///movie.db")
 
 # v1: Configure SQLlite DB
 #app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///movies_sqlite.db"
@@ -63,6 +58,7 @@ class Wishlist(db.Model):
     imdb_rating = db.Column(db.Float)
     boxoffice = db.Column(db.String(200))
 
+# v1: SQLlite DB create tables
 # with app.app_context():
 #     db.create_all()
 
@@ -310,7 +306,6 @@ def wishlist():
 def search():
     if request.method == "POST":
         # User request to search
-        # TODO: check if there's a better way to write this
         if "search_movie" in request.form:
             # Ensure user input movie title
             if not request.form.get("title"):
