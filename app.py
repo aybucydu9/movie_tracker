@@ -206,8 +206,6 @@ def add_movie():
 def history():
     if request.method == "POST":
         if "delete" in request.form:
-            # db.execute("DELETE FROM watch_history WHERE user_id = ? and movie_id = ? and watch_date = ?",
-            #     session["user_id"], request.form.get("movie_id"), request.form.get("date"))
             query = Watch_history.query.filter_by(user_id=session["user_id"], movie_id=request.form.get("movie_id"), watch_date=request.form.get("date")).first()
             db.session.delete(query)
             db.session.commit()
