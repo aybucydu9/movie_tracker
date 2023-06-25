@@ -24,7 +24,7 @@
 
         <nav class="bg-light border navbar navbar-expand-md navbar-light">
             <div class="container-fluid">
-                <a class="navbar-brand" href="/"><span class="blue">My</span> <span class="red">M</span><span class="yellow">o</span><span class="green">v</span><span class="red">ies</span></a>
+                <a class="navbar-brand" href="/">Movie Tracker</span></a>
                 <button aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbar" data-bs-toggle="collapse" type="button">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -32,8 +32,9 @@
                     {% if session["user_id"] %}
                         <ul class="navbar-nav me-auto mt-2">
                             <li class="nav-item"><a class="nav-link" href="/search">Search for Movies</a></li>
-                            <li class="nav-item"><a class="nav-link" href="/history">Watch History</a></li>
-                            <li class="nav-item"><a class="nav-link" href="/wishlist">Wishlist</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/history">My Watch History</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/wishlist">My Wish List</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/stats">Statistics Dashboard</a></li>
                         </ul>
                         <ul class="navbar-nav ms-auto mt-2">
                             <li class="nav-item"><a class="nav-link" href="/logout">Log Out</a></li>

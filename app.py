@@ -5,6 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime, date
+from sqlalchemy import func
 
 from helper import apology, login_required, lookup
 
@@ -66,10 +67,38 @@ with app.app_context():
 if not os.environ.get("API_KEY"):
     raise RuntimeError("API_KEY not set")
 
+def find_highest(table, metric):
+    results = list()
+
+    subquery = db.session.query(
+        table,
+        func.rank().over(
+            order_by=getattr(table, metric).desc(),
+            partition_by=table.user_id
+        ).label('rnk')
+    ).subquery()
+
+    query = db.session.query(subquery).filter(
+        subquery.c.rnk==1,
+        subquery.c.user_id==session["user_id"]
+    ).all()
+
+    for movie in query:
+        if movie.movie_id not in results:
+            results.append(movie.movie_id)
+
+    if not results:
+        if table == Wishlist:
+            return "You don't have any records in your Wish List"
+        elif table == Watch_history:
+            return "You don't have any records in your Watch History"
+    else:
+        return results
+
 @app.route("/", methods=["GET"])
 @login_required
 def homepage():
-    return render_template("layout.html")
+    return render_template("homepage.html")
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -408,3 +437,63 @@ def search():
             return redirect("/wishlist")
     else:
         return render_template("search.html")
+    
+@app.route("/stats", methods=["GET"])
+@login_required
+def stats():
+    stats_list = list()
+    # total movies watched
+    results = db.session.query(Watch_history).filter_by(user_id=session["user_id"]).count()
+    stats_list.append({"question": "Total records in Watch History", 
+                        "answer": results})
+    
+    # unique movies watched
+    results = db.session.query(Watch_history.movie_id).filter_by(user_id=session["user_id"]).distinct().count()
+    stats_list.append({"question": "Number of unique movies watched", 
+                        "answer": results})
+    
+    # number of wishlist items
+    results = db.session.query(Wishlist).filter_by(user_id=session["user_id"]).count()
+    stats_list.append({"question": "Number of movies in Wishlist", 
+                        "answer": results})
+    
+    # movies with the highest IMDB rating in your wishlist
+    # results = Wishlist.query.filter_by(user_id=session["user_id"]).order_by(Wishlist.imdb_rating.desc()).first()
+    # stats_list.append({"question": "Movie in your Wish List with the highest IMDB rating", 
+    #                     "answer": results.movie_id})
+    results = find_highest(Wishlist, "imdb_rating")
+    stats_list.append({"question": "Movie in your Wish List with the highest IMDB rating", 
+                        "answer": results})
+    
+    # wishlist with the highest box office
+    results = find_highest(Wishlist, "boxoffice")
+    stats_list.append({"question": "Movie in your Wish List with the highest Box office", 
+                        "answer": results})
+    
+    # movies with the highest personal rating
+    results = find_highest(Watch_history, "personal_rating")
+    stats_list.append({"question": "Movie in your Watch History with the highest personal rating", 
+                        "answer": results})
+
+    # watch history with the highest box office
+    results = find_highest(Watch_history, "boxoffice")
+    stats_list.append({"question": "Movie with the highest Box office you have watched", 
+                        "answer": results})
+
+    # movies with the highest 
+    # watch history with the highest IMDB rating
+    results = find_highest(Watch_history, "imdb_rating")
+    stats_list.append({"question": "Movie with the highest IMDB rating you have watched", 
+                        "answer": results})
+
+    # movies you over-rate
+
+    # movies you under-rate
+
+    # movies you watched the most times
+
+    # number of movies you watched this year
+
+    # days since you last watched a movie
+    
+    return render_template("dashboard.html", stats=stats_list)

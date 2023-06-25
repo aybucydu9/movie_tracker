@@ -1,9 +1,28 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Dashboard
+    Stats Dashboard
 {% endblock %}
 
 {% block main %}
+<table class="table table-sm">
+    <thead>
+        <tr>
+            <th>Question</th>
+            <th>Answer</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- TODO: Loop through the database entries to display them in this table -->
+        {% for record in stats %}
+            <form action="/wishlist" method="POST">
+                <tr>
+                    <td class="align-middle">{{ record.question }}</td>
+                    <td class="align-middle">{{ record.answer }}</td>
+                </tr>
+            </form>
+        {% endfor %}
+    </tbody>
+</table>
 
 {% endblock %}
