@@ -301,8 +301,8 @@ def wishlist():
                                           watch_date=datetime.strptime(request.form.get("watchdate"), '%Y-%m-%d').date(), 
                                           personal_rating=rating, 
                                           comments=request.form.get("comments"),
-                                          imdb_rating=request.form.get("imdb_rating"),
-                                          boxoffice=request.form.get("boxoffice"))
+                                          imdb_rating=request.form.get("imdb_correct"),
+                                          boxoffice=request.form.get("box_office_correct"))
             db.session.add(movie_watched)
             db.session.commit()
 

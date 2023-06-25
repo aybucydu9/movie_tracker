@@ -39,7 +39,7 @@
                         <input type="hidden" name="imdb_rating" value="{{ record.imdb_rating }}" />
                         <td class="align-middle">{{ record.comments }}</td>
                         <td class="align-middle">
-                            <button class="btn btn-warning btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#watch-history" data-extra-info = "{{ record.movie_id }}">Move to Watch History</button>
+                            <button class="btn btn-warning btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#watch-history" data-name = "{{ record.movie_id }}" data-imdb = "{{ record.imdb_rating }}" data-boxoffice = "{{ record.boxoffice }}">Move to Watch History</button>
                         </td>
                         <td class="align-middle">
                             <button class="btn btn-dark btn-sm" name="delete" type="submit">Delete</button>
@@ -55,9 +55,11 @@
                             </div>
                             <div class="modal-body">
                                 <div class="mb-3">
-                                    <label for="movie-name" class="col-form-label">Movie name: (Don't modify)</label>
-                                    <input type="text" class="form-control" id="movie-name" name="movie_name">
-                                  </div>
+                                    <label for="movie-name" class="col-form-label">Movie name:</label>
+                                    <input type="text" class="form-control" id="movie-name" name="movie_name" readonly>
+                                </div>
+                                <input type="hidden" class="form-control" id="imdb-correct" name="imdb_correct" readonly>
+                                <input type="hidden" class="form-control" id="box-office-correct" name="box_office_correct" readonly>
                                 <div class="mb-3">
                                     <label for="watchdate">Watch Date</label>
                                     <input id="watchdate" class="form-control" type="date" name="watchdate" />
@@ -69,7 +71,6 @@
                                 <div class="mb-3">
                                     <label for="comments" class="col-form-label">Comments:</label>
                                     <textarea class="form-control" id="comments" name="comments"></textarea>
-                                    <input type="hidden" name="movie_id" value="{{ record.movie_id }}" />
                                 </div>
                             </div>
                             <div class="modal-footer">
@@ -88,17 +89,19 @@
         exampleModal.addEventListener('show.bs.modal', function (event) {
         // Button that triggered the modal
         var button = event.relatedTarget
-        // Extract info from data-bs-* attributes
-        var recipient = button.getAttribute('data-extra-info')
-        // If necessary, you could initiate an AJAX request here
-        // and then do the updating in a callback.
-        //
+        // Extract info from data-* attributes
+        var recipient = button.getAttribute('data-name')
+        var imdb_value = button.getAttribute('data-imdb')
+        var box_office_value = button.getAttribute('data-boxoffice')
+        
         // Update the modal's content.
-        var modalTitle = exampleModal.querySelector('.modal-title')
-        var modalBodyInput = exampleModal.querySelector('.modal-body input')
+        var modalBodyInput = exampleModal.querySelector('#movie-name')
+        var imdbInput = exampleModal.querySelector('#imdb-correct')
+        var boxofficeInput = exampleModal.querySelector('#box-office-correct')
 
-        //modalTitle.textContent = 'New message to ' + recipient
         modalBodyInput.value = recipient
+        imdbInput.value = imdb_value
+        boxofficeInput.value = box_office_value
         })
     </script>
 {% endblock %}
