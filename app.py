@@ -277,7 +277,7 @@ def wishlist():
                 return apology("Rating can't exceed 10")
 
             # Check whether this movie has been added for that day already
-            record = Watch_history.query.filter_by(user_id=session["user_id"], movie_id=request.form.get("title"), watch_date=request.form.get("watchdate")).first()
+            record = Watch_history.query.filter_by(user_id=session["user_id"], movie_id=request.form.get("movie_name"), watch_date=request.form.get("watchdate")).first()
             if record is not None:
                 return apology("This watch history has already been recorded")
 
@@ -286,17 +286,18 @@ def wishlist():
             rows = Movies.query.filter_by(movie_id=request.form.get("movie_id")).first()
             if rows is None:
                 # if not add the movie to movies table
-                movies = Movies(movie_id=request.form.get("movie_id"),
-                                year = request.form.get("year"), 
-                                genre=request.form.get("genre"),
-                                director = request.form.get("director"),
-                                language = request.form.get("language"))
-                db.session.add(movies)
-                db.session.commit()
+                # movies = Movies(movie_id=request.form.get("movie_id"),
+                #                 year = request.form.get("year"), 
+                #                 genre=request.form.get("genre"),
+                #                 director = request.form.get("director"),
+                #                 language = request.form.get("language"))
+                # db.session.add(movies)
+                # db.session.commit()
+                return apology("Please don't modify Movie Name")
 
             # Update watch history
             movie_watched = Watch_history(user_id=session["user_id"], 
-                                          movie_id = request.form.get("movie_id"), 
+                                          movie_id = request.form.get("movie_name"), 
                                           watch_date=datetime.strptime(request.form.get("watchdate"), '%Y-%m-%d').date(), 
                                           personal_rating=rating, 
                                           comments=request.form.get("comments"),
@@ -308,7 +309,7 @@ def wishlist():
             
             # Update wishlist table
             query = Wishlist.query.filter_by(user_id=session["user_id"], 
-                                             movie_id=request.form.get("movie_id")).first()
+                                             movie_id=request.form.get("movie_name")).first()
             db.session.delete(query)
             db.session.commit()
 
