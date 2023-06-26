@@ -513,12 +513,13 @@ def stats():
                         "answer": results})
 
     # days since you last watched a movie
-    most_recent_movie = Watch_history.query.filter(Watch_history.user_id==session["user_id"],
-                                         Watch_history.watch_date <= datetime.now()).order_by(Watch_history.watch_date.desc()).first()
-    date_diff = date.today() - most_recent_movie.watch_date
-    date_diff = str(date_diff.days)
+    # most_recent_movie = Watch_history.query.filter(Watch_history.user_id==session["user_id"],
+    #                                      Watch_history.watch_date <= datetime.now()).order_by(Watch_history.watch_date.desc()).first()
+    # date_diff = date.today() - most_recent_movie.watch_date
+    # date_diff = str(date_diff.days)
+    results = find_most_recent_watch()
     stats_list.append({"question": "Days since you last watched a movie", 
-                        "answer": date_diff + " days"})
+                        "answer": results + " days"})
 
     # oldest movie you have watched
     results = find_oldest_movie()
@@ -710,3 +711,18 @@ def find_favorite(option):
         return "Too many "+ option + " tie as your favorite "+ option
     else:
         return results
+    
+def find_most_recent_watch():
+    most_recent_movie = Watch_history.query.filter(
+        Watch_history.user_id==session["user_id"],
+        Watch_history.watch_date <= datetime.now()
+    ).order_by(
+        Watch_history.watch_date.desc()
+    ).first()
+    
+    if most_recent_movie is None:
+        return "You don't have any record in your Watch History"
+
+    date_diff = date.today() - most_recent_movie.watch_date
+    date_diff = str(date_diff.days)
+    return date_diff
