@@ -67,59 +67,6 @@ with app.app_context():
 if not os.environ.get("API_KEY"):
     raise RuntimeError("API_KEY not set")
 
-def find_highest(table, metric):
-    results = list()
-
-    subquery = db.session.query(
-        table,
-        func.rank().over(
-            order_by=getattr(table, metric).desc(),
-            partition_by=table.user_id
-        ).label('rnk')
-    ).subquery()
-
-    query = db.session.query(subquery).filter(
-        subquery.c.rnk==1,
-        subquery.c.user_id==session["user_id"]
-    ).all()
-
-    for movie in query:
-        if movie.movie_id not in results:
-            results.append(movie.movie_id)
-
-    if not results:
-        if table == Wishlist:
-            return "You don't have any records in your Wish List"
-        elif table == Watch_history:
-            return "You don't have any records in your Watch History"
-    else:
-        return results
-
-def find_highest_box_office(table):
-    movie_pairs = {}
-
-    all_movies = table.query.filter(table.user_id==session["user_id"], table.boxoffice != "N/A").all()
-
-    for movie in all_movies:
-        if movie.movie_id not in movie_pairs:
-            box_office_num = int(movie.boxoffice[1:].replace(",", ""))
-            movie_pairs[movie.movie_id] = box_office_num
-    
-    max_box_office = max(movie_pairs.values(), default=0)
-    
-    results = [k for k, v in movie_pairs.items() if v == max_box_office]
-
-    if not results:
-        if table == Wishlist:
-            return "You don't have any records with valid box office in your Wish List"
-        elif table == Watch_history:
-            return "You don't have any records with valid box office in your Watch History"
-    else:
-        return results
-    
-
-
-
 @app.route("/", methods=["GET"])
 @login_required
 def homepage():
@@ -512,14 +459,143 @@ def stats():
     stats_list.append({"question": "highest IMDB rating movie you have watched", 
                         "answer": results})
 
-    # movies you over-rate
+    # movies you love more than imdb
+    #results = find_over_rated()
+    results = compare_personal_rating_with_imdb("rate higher")
+    stats_list.append({"question": "Movie you love way more than others (IMDB)", 
+                        "answer": results})
 
     # movies you under-rate
+    results = compare_personal_rating_with_imdb("rate lower")
+    stats_list.append({"question": "Movie you rate the lowest in comparison to others (IMDB)", 
+                        "answer": results})
 
     # movies you watched the most times
 
     # number of movies you watched this year
 
     # days since you last watched a movie
+
+    # oldest movie you have watched
+
+    # favorite genre
     
     return render_template("dashboard.html", stats=stats_list)
+
+def find_highest(table, metric):
+    results = list()
+
+    subquery = db.session.query(
+        table,
+        func.rank().over(
+            order_by=getattr(table, metric).desc(),
+            partition_by=table.user_id
+        ).label('rnk')
+    ).subquery()
+
+    query = db.session.query(subquery).filter(
+        subquery.c.rnk==1,
+        subquery.c.user_id==session["user_id"]
+    ).all()
+
+    for movie in query:
+        if movie.movie_id not in results:
+            results.append(movie.movie_id)
+
+    if not results:
+        if table == Wishlist:
+            return "You don't have any record in your Wish List"
+        elif table == Watch_history:
+            return "You don't have any record in your Watch History"
+    else:
+        return results
+
+def find_highest_box_office(table):
+    movie_pairs = {}
+
+    all_movies = table.query.filter(table.user_id==session["user_id"]).all()
+
+    for movie in all_movies:
+        if movie.boxoffice == "N/A":
+            movie_pairs[movie.movie_id] = 0
+        elif movie.movie_id not in movie_pairs:
+            box_office_num = int(movie.boxoffice[1:].replace(",", ""))
+            movie_pairs[movie.movie_id] = box_office_num
+    
+    if movie_pairs == {}:
+        return "You don't have any record in your Watch History"
+
+    max_box_office = max(movie_pairs.values())
+
+    if max_box_office == 0:
+        if table == Wishlist:
+            return "You don't have any record with valid box office in your Wish List"
+        elif table == Watch_history:
+            return "You don't have any record with valid box office in your Watch History"
+    
+    results = [k for k, v in movie_pairs.items() if v == max_box_office]
+
+    return results
+
+def find_over_rated():
+    movie_pairs = {}
+
+    all_movies = Watch_history.query.filter(Watch_history.user_id==session["user_id"]).all()
+
+    for movie in all_movies:
+        if movie.movie_id not in movie_pairs:
+            personal_minus_imdb = movie.personal_rating - movie.imdb_rating
+            movie_pairs[movie.movie_id] = personal_minus_imdb
+        elif movie.movie_id in movie_pairs:
+            personal_minus_imdb = movie.personal_rating - movie.imdb_rating
+            if personal_minus_imdb > movie_pairs[movie.movie_id]:
+                movie_pairs[movie.movie_id] = personal_minus_imdb
+
+    if movie_pairs == {}:
+        return "You don't have any record in your Watch History"
+    
+    max_over_rate = max(movie_pairs.values(), default=0)
+
+    results = [k for k, v in movie_pairs.items() if v == max_over_rate]
+
+    if max_over_rate <= 0:
+        return "You don't have any over rated record in your Watch History"
+    else:
+        return results
+    
+def compare_personal_rating_with_imdb(option):
+    if option not in ["rate higher", "rate lower"]:
+        raise ValueError('option input should be either "rate higher" or "rate lower"')
+    movie_pairs = {}
+
+    all_movies = Watch_history.query.filter(Watch_history.user_id==session["user_id"]).all()
+
+    for movie in all_movies:
+        personal_minus_imdb = movie.personal_rating - movie.imdb_rating
+        if movie.movie_id not in movie_pairs:
+            movie_pairs[movie.movie_id] = personal_minus_imdb
+        # if user has multiple record of the same movie and different rating each time
+        elif movie.movie_id in movie_pairs:
+            if option == "rate higher": #keep the one you over-rate the highest
+                if personal_minus_imdb > movie_pairs[movie.movie_id]:
+                    movie_pairs[movie.movie_id] = personal_minus_imdb
+            elif option == "rate lower": #keep the one you under-rate the highest
+                if personal_minus_imdb < movie_pairs[movie.movie_id]:
+                    movie_pairs[movie.movie_id] = personal_minus_imdb
+
+    if movie_pairs == {}:
+        return "You don't have any record in your Watch History"
+    
+    if option == "rate higher":
+        diff = max(movie_pairs.values(), default=0)
+    if option == "rate lower":
+        diff = min(movie_pairs.values(), default=0)
+
+    results = [k for k, v in movie_pairs.items() if v == diff]
+
+    if option == "rate higher" and diff <= 0:
+        return "You don't have any record in your Watch History you " + option + " than IMDB"
+    elif option == "rate lower" and diff >=0:
+        return "You don't have any record in your Watch History you " + option + " than IMDB"
+    else:
+        return results
