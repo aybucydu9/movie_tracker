@@ -95,6 +95,31 @@ def find_highest(table, metric):
     else:
         return results
 
+def find_highest_box_office(table):
+    movie_pairs = {}
+
+    all_movies = table.query.filter(table.user_id==session["user_id"], table.boxoffice != "N/A").all()
+
+    for movie in all_movies:
+        if movie.movie_id not in movie_pairs:
+            box_office_num = int(movie.boxoffice[1:].replace(",", ""))
+            movie_pairs[movie.movie_id] = box_office_num
+    
+    max_box_office = max(movie_pairs.values(), default=0)
+    
+    results = [k for k, v in movie_pairs.items() if v == max_box_office]
+
+    if not results:
+        if table == Wishlist:
+            return "You don't have any records with valid box office in your Wish List"
+        elif table == Watch_history:
+            return "You don't have any records with valid box office in your Watch History"
+    else:
+        return results
+    
+
+
+
 @app.route("/", methods=["GET"])
 @login_required
 def homepage():
@@ -234,6 +259,7 @@ def history():
             query = Watch_history.query.filter_by(user_id=session["user_id"], movie_id=request.form.get("movie_id"), watch_date=request.form.get("date")).first()
             db.session.delete(query)
             db.session.commit()
+
     """Show history of transactions"""
     history = list()
     results = db.session.query(Movies, Watch_history).join(Watch_history).filter(Watch_history.user_id==session["user_id"]).order_by(Watch_history.watch_date.desc()).all()
@@ -450,7 +476,7 @@ def stats():
     
     # unique movies watched
     results = db.session.query(Watch_history.movie_id).filter_by(user_id=session["user_id"]).distinct().count()
-    stats_list.append({"question": "Number of unique movies watched", 
+    stats_list.append({"question": "Number of unique movies you have watched", 
                         "answer": results})
     
     # number of wishlist items
@@ -459,32 +485,31 @@ def stats():
                         "answer": results})
     
     # movies with the highest IMDB rating in your wishlist
-    # results = Wishlist.query.filter_by(user_id=session["user_id"]).order_by(Wishlist.imdb_rating.desc()).first()
-    # stats_list.append({"question": "Movie in your Wish List with the highest IMDB rating", 
-    #                     "answer": results.movie_id})
     results = find_highest(Wishlist, "imdb_rating")
-    stats_list.append({"question": "Movie in your Wish List with the highest IMDB rating", 
+    stats_list.append({"question": "Most highly rated movie you want to watch", 
+                #        "question": "Movie in your Wish List with the highest IMDB rating", 
                         "answer": results})
     
     # wishlist with the highest box office
-    results = find_highest(Wishlist, "boxoffice")
-    stats_list.append({"question": "Movie in your Wish List with the highest Box office", 
+    results = find_highest_box_office(Wishlist)
+    stats_list.append({"question": "Most popular movie you want to watch", 
+                    #    "question": "Movie in your Wish List with the highest Box office", 
                         "answer": results})
     
     # movies with the highest personal rating
     results = find_highest(Watch_history, "personal_rating")
-    stats_list.append({"question": "Movie in your Watch History with the highest personal rating", 
+    stats_list.append({"question": "Movie you rated the highest", 
+                    #    "question": "Movie in your Watch History with the highest personal rating", 
                         "answer": results})
 
-    # watch history with the highest box office
-    results = find_highest(Watch_history, "boxoffice")
-    stats_list.append({"question": "Movie with the highest Box office you have watched", 
+    # watch history with the highest box office 
+    results = find_highest_box_office(Watch_history)
+    stats_list.append({"question": "Most popular movie you have watched", 
                         "answer": results})
 
-    # movies with the highest 
     # watch history with the highest IMDB rating
     results = find_highest(Watch_history, "imdb_rating")
-    stats_list.append({"question": "Movie with the highest IMDB rating you have watched", 
+    stats_list.append({"question": "highest IMDB rating movie you have watched", 
                         "answer": results})
 
     # movies you over-rate
