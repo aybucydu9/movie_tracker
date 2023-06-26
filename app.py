@@ -5,7 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime, date
-from sqlalchemy import func
+from sqlalchemy import func, extract
 
 from helper import apology, login_required, lookup
 
@@ -471,14 +471,34 @@ def stats():
                         "answer": results})
 
     # movies you watched the most times
+    results = most_watch()
+    stats_list.append({"question": "Movie you can't stop re-watching", 
+                        "answer": results})
 
     # number of movies you watched this year
+    current_year = datetime.now().year
+    results = Watch_history.query.filter(Watch_history.user_id==session["user_id"],
+                               extract('year', Watch_history.watch_date) == current_year).count()
+    stats_list.append({"question": "Number of times you have watched movie this year", 
+                        "answer": results})
 
     # days since you last watched a movie
+    most_recent_movie = Watch_history.query.filter(Watch_history.user_id==session["user_id"],
+                                         Watch_history.watch_date <= datetime.now()).order_by(Watch_history.watch_date.desc()).first()
+    date_diff = date.today() - most_recent_movie.watch_date
+    date_diff = str(date_diff.days)
+    stats_list.append({"question": "Days since you last watched a movie", 
+                        "answer": date_diff + " days"})
 
     # oldest movie you have watched
+    results = find_oldest_movie()
+    stats_list.append({"question": "Oldest movie you have watched", 
+                        "answer": results})
 
     # favorite genre
+    results = find_favorite_genre()
+    stats_list.append({"question": "Your favorite genre", 
+                        "answer": results})
     
     return render_template("dashboard.html", stats=stats_list)
 
@@ -597,5 +617,84 @@ def compare_personal_rating_with_imdb(option):
         return "You don't have any record in your Watch History you " + option + " than IMDB"
     elif option == "rate lower" and diff >=0:
         return "You don't have any record in your Watch History you " + option + " than IMDB"
+    else:
+        return results
+    
+def most_watch():
+    movie_pairs = {}
+
+    all_movies = Watch_history.query.filter(Watch_history.user_id==session["user_id"]).all()
+
+    for movie in all_movies:
+        if movie.movie_id not in movie_pairs:
+            movie_pairs[movie.movie_id] = 1
+        # if user has multiple record of the same movie and different rating each time
+        elif movie.movie_id in movie_pairs:
+            movie_pairs[movie.movie_id] = movie_pairs[movie.movie_id] + 1
+
+    if movie_pairs == {}:
+        return "You don't have any record in your Watch History"
+    
+    most_watch = max(movie_pairs.values(), default=0)
+
+    results = [k for k, v in movie_pairs.items() if v == most_watch]
+
+    if len(results) > 3:
+        return "Too many movies tie as the most watched movie"
+    else:
+        return results
+    
+def find_oldest_movie():
+    movie_pairs = {}
+
+    all_movies = db.session.query(
+        Movies, Watch_history
+    ).join(
+        Watch_history
+    ).filter(
+        Watch_history.user_id==session["user_id"]
+    ).all()
+
+    for movie, watch_history in all_movies:
+        if movie.movie_id not in movie_pairs:
+            movie_pairs[movie.movie_id] = movie.year
+    
+    if movie_pairs == {}:
+        return "You don't have any record in your Watch History"
+
+    oldest_year = min(movie_pairs.values())
+
+    results = [k for k, v in movie_pairs.items() if v == oldest_year]
+
+    return results
+
+def find_favorite_genre():
+    movie_pairs = {}
+
+    all_movies = db.session.query(
+        Movies, Watch_history
+    ).join(
+        Watch_history
+    ).filter(
+        Watch_history.user_id==session["user_id"]
+    ).all()
+
+    for movie, watch_history in all_movies:
+        genre_list = movie.genre.split(", ")
+        for genre in genre_list:
+            if genre not in movie_pairs:
+                movie_pairs[genre] = 1
+            elif genre in movie_pairs:
+                movie_pairs[genre] = movie_pairs[genre] + 1
+
+    if movie_pairs == {}:
+        return "You don't have any record in your Watch History"
+    
+    favorite_genre = max(movie_pairs.values(), default=0)
+
+    results = [k for k, v in movie_pairs.items() if v == favorite_genre]
+
+    if len(results) > 3:
+        return "Too many genre tie as your favorite genre"
     else:
         return results
