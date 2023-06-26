@@ -170,37 +170,6 @@ def register():
     else:
         return render_template("register.html")
 
-@app.route("/add_movie", methods=["GET", "POST"])
-@login_required
-def add_movie():
-    if request.method == "POST":
-
-        # Ensure user input movie title
-        if not request.form.get("title"):
-            return apology("Title must not be null")
-
-        # Ensure rating is float
-        try:
-            rating = float(request.form.get("personal_rating"))
-        except ValueError:
-            return apology("Rating must be numerical")
-
-        # Ensure rating within rating range
-        if rating < 0:
-            return apology("Rating can not be negative")
-        elif rating > 10:
-            return apology("Rating can't exceed 10")
-
-        # Update watch history
-        movie_watched = Watch_history(user_id=session["user_id"], movie_id = request.form.get("title"), personal_rating=rating)
-        db.session.add(movie_watched)
-        db.session.commit()
-
-        return redirect("/")
-
-    else:
-        return render_template("add_movie.html")
-
 @app.route("/history", methods=["GET", "POST"])
 @login_required
 def history():
@@ -729,3 +698,34 @@ def find_most_recent_watch():
     date_diff = date.today() - most_recent_movie.watch_date
     date_diff = str(date_diff.days)
     return date_diff
+
+# @app.route("/add_movie", methods=["GET", "POST"])
+# @login_required
+# def add_movie():
+#     if request.method == "POST":
+
+#         # Ensure user input movie title
+#         if not request.form.get("title"):
+#             return apology("Title must not be null")
+
+#         # Ensure rating is float
+#         try:
+#             rating = float(request.form.get("personal_rating"))
+#         except ValueError:
+#             return apology("Rating must be numerical")
+
+#         # Ensure rating within rating range
+#         if rating < 0:
+#             return apology("Rating can not be negative")
+#         elif rating > 10:
+#             return apology("Rating can't exceed 10")
+
+#         # Update watch history
+#         movie_watched = Watch_history(user_id=session["user_id"], movie_id = request.form.get("title"), personal_rating=rating)
+#         db.session.add(movie_watched)
+#         db.session.commit()
+
+#         return redirect("/")
+
+#     else:
+#         return render_template("add_movie.html")
