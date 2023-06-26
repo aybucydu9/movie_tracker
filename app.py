@@ -487,7 +487,7 @@ def stats():
 
     # watch history with the highest IMDB rating
     results = find_highest(Watch_history, "imdb_rating")
-    stats_list.append({"question": "highest IMDB rating movie you have watched", 
+    stats_list.append({"question": "Highest IMDB rating movie you have watched", 
                         "answer": results})
 
     # movies you love more than imdb
@@ -580,7 +580,10 @@ def find_highest_box_office(table):
             movie_pairs[movie.movie_id] = box_office_num
     
     if movie_pairs == {}:
-        return "You don't have any record in your Watch History"
+        if table == Wishlist:
+            return "You don't have any record in your Wish List"
+        elif table == Watch_history:
+            return "You don't have any record in your Watch History"
 
     max_box_office = max(movie_pairs.values())
 
