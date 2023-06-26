@@ -434,19 +434,16 @@ def stats():
     # movies with the highest IMDB rating in your wishlist
     results = find_highest(Wishlist, "imdb_rating")
     stats_list.append({"question": "Most highly rated movie you want to watch", 
-                #        "question": "Movie in your Wish List with the highest IMDB rating", 
                         "answer": results})
     
     # wishlist with the highest box office
     results = find_highest_box_office(Wishlist)
     stats_list.append({"question": "Most popular movie you want to watch", 
-                    #    "question": "Movie in your Wish List with the highest Box office", 
                         "answer": results})
     
     # movies with the highest personal rating
     results = find_highest(Watch_history, "personal_rating")
-    stats_list.append({"question": "Movie you rated the highest", 
-                    #    "question": "Movie in your Watch History with the highest personal rating", 
+    stats_list.append({"question": "Movie you rated the highest",  
                         "answer": results})
 
     # watch history with the highest box office 
@@ -460,7 +457,6 @@ def stats():
                         "answer": results})
 
     # movies you love more than imdb
-    #results = find_over_rated()
     results = compare_personal_rating_with_imdb("rate higher")
     stats_list.append({"question": "Movie you love way more than others (IMDB)", 
                         "answer": results})
@@ -496,9 +492,15 @@ def stats():
                         "answer": results})
 
     # favorite genre
-    results = find_favorite_genre()
+    results = find_favorite("genre")
     stats_list.append({"question": "Your favorite genre", 
                         "answer": results})
+    
+    # favorite director
+    results = find_favorite("director")
+    stats_list.append({"question": "Your favorite director", 
+                        "answer": results})
+    
     
     return render_template("dashboard.html", stats=stats_list)
 
@@ -557,32 +559,6 @@ def find_highest_box_office(table):
 
     return results
 
-def find_over_rated():
-    movie_pairs = {}
-
-    all_movies = Watch_history.query.filter(Watch_history.user_id==session["user_id"]).all()
-
-    for movie in all_movies:
-        if movie.movie_id not in movie_pairs:
-            personal_minus_imdb = movie.personal_rating - movie.imdb_rating
-            movie_pairs[movie.movie_id] = personal_minus_imdb
-        elif movie.movie_id in movie_pairs:
-            personal_minus_imdb = movie.personal_rating - movie.imdb_rating
-            if personal_minus_imdb > movie_pairs[movie.movie_id]:
-                movie_pairs[movie.movie_id] = personal_minus_imdb
-
-    if movie_pairs == {}:
-        return "You don't have any record in your Watch History"
-    
-    max_over_rate = max(movie_pairs.values(), default=0)
-
-    results = [k for k, v in movie_pairs.items() if v == max_over_rate]
-
-    if max_over_rate <= 0:
-        return "You don't have any over rated record in your Watch History"
-    else:
-        return results
-    
 def compare_personal_rating_with_imdb(option):
     if option not in ["rate higher", "rate lower"]:
         raise ValueError('option input should be either "rate higher" or "rate lower"')
@@ -668,7 +644,9 @@ def find_oldest_movie():
 
     return results
 
-def find_favorite_genre():
+def find_favorite(option):
+    if option not in ["genre", "director"]:
+        raise ValueError('option input should be either "genre" or "director"')
     movie_pairs = {}
 
     all_movies = db.session.query(
@@ -680,21 +658,21 @@ def find_favorite_genre():
     ).all()
 
     for movie, watch_history in all_movies:
-        genre_list = movie.genre.split(", ")
-        for genre in genre_list:
-            if genre not in movie_pairs:
-                movie_pairs[genre] = 1
-            elif genre in movie_pairs:
-                movie_pairs[genre] = movie_pairs[genre] + 1
+        list = getattr(movie, option).split(", ")
+        for item in list:
+            if item not in movie_pairs:
+                movie_pairs[item] = 1
+            elif item in movie_pairs:
+                movie_pairs[item] = movie_pairs[item] + 1
 
     if movie_pairs == {}:
         return "You don't have any record in your Watch History"
     
-    favorite_genre = max(movie_pairs.values(), default=0)
+    favorite = max(movie_pairs.values(), default=0)
 
-    results = [k for k, v in movie_pairs.items() if v == favorite_genre]
+    results = [k for k, v in movie_pairs.items() if v == favorite]
 
     if len(results) > 3:
-        return "Too many genre tie as your favorite genre"
+        return "Too many "+ option + " tie as your favorite "+ option
     else:
         return results
