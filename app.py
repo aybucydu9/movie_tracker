@@ -42,6 +42,7 @@ class Movies(db.Model):
     genre = db.Column(db.String(200))
     director = db.Column(db.String(200))
     language = db.Column(db.String(200))
+    poster_url = db.Column(db.String(300))
 
 class Watch_history(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), primary_key=True)
@@ -70,6 +71,8 @@ if not os.environ.get("API_KEY"):
 @app.route("/", methods=["GET"])
 @login_required
 def homepage():
+    # result = Movies.query.first()
+    # poster = result.poster_url
     return render_template("homepage.html")
 
 @app.route("/login", methods=["GET", "POST"])
@@ -330,6 +333,8 @@ def search():
 
         # User request to add the movie to watch history
         if "add_to_history" in request.form:
+            result = lookup(request.form.get("title"))
+
             # Ensure watch date is not null
             if not request.form.get("watchdate"):
                 return apology("Watch date must not be null")
@@ -360,7 +365,8 @@ def search():
                                 year = request.form.get("year"), 
                                 genre=request.form.get("genre"),
                                 director = request.form.get("director"),
-                                language = request.form.get("language"))
+                                language = request.form.get("language"),
+                                poster_url = result["poster"])
                 db.session.add(movies)
                 db.session.commit()
 
@@ -380,6 +386,7 @@ def search():
 
         # User request to add the movie to wishlist
         if "add_to_wishlist" in request.form:
+            result = lookup(request.form.get("title"))
             # If movie already exist in wishlist
             rows = Wishlist.query.filter_by(user_id=session["user_id"], movie_id=request.form.get("title")).first()
             if rows is not None:
@@ -394,7 +401,8 @@ def search():
                                 year = request.form.get("year"), 
                                 genre=request.form.get("genre"),
                                 director = request.form.get("director"),
-                                language = request.form.get("language"))
+                                language = request.form.get("language"),
+                                poster_url = result["poster"])
                 db.session.add(movies)
                 db.session.commit()
 
@@ -412,10 +420,36 @@ def search():
     else:
         return render_template("search.html")
     
+@app.route("/posterwall", methods=["GET"])
+@login_required
+def poster_wall():
+    poster_list = []
+    # # Retrieve the image data from the database
+
+    all_movies = db.session.query(
+        Movies, Watch_history
+    ).join(
+        Watch_history
+    ).filter(
+        Watch_history.user_id==session["user_id"]
+    ).order_by(
+        Watch_history.watch_date
+    ).all()
+
+
+    for movie, watch_history in all_movies:
+        poster = movie.poster_url
+        if poster not in poster_list:
+            poster_list.append(poster)
+
+    #TODO: this will cause trouble for new user just registered
+    return render_template("poster_wall.html", poster_list=poster_list)
+
 @app.route("/stats", methods=["GET"])
 @login_required
 def stats():
     stats_list = list()
+    stats_list_with_image = list()
     # total movies watched
     results = db.session.query(Watch_history).filter_by(user_id=session["user_id"]).count()
     stats_list.append({"question": "Total records in Watch History", 
@@ -443,7 +477,7 @@ def stats():
     
     # movies with the highest personal rating
     results = find_highest(Watch_history, "personal_rating")
-    stats_list.append({"question": "Movie you rated the highest",  
+    stats_list_with_image.append({"question": "Movie you rated the highest",  
                         "answer": results})
 
     # watch history with the highest box office 
@@ -502,7 +536,7 @@ def stats():
                         "answer": results})
     
     
-    return render_template("dashboard.html", stats=stats_list)
+    return render_template("dashboard_cards.html", stats=stats_list)
 
 def find_highest(table, metric):
     results = list()

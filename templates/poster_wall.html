@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Poster Wall
+{% endblock %}
+
+{% block main %}
+    {% for record in poster_list %}
+        <img src="{{ record }}">
+    {% endfor %}
+{% endblock %}
