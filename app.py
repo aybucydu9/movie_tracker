@@ -21,10 +21,10 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 # v1: Configure SQLlite DB
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///movies_sqlite.db" #TODO
+# app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///movies_sqlite.db" 
 
 # v2: Config for Heroku
-#app.config["SQLALCHEMY_DATABASE_URI"] = os.environ['POSTGRESQL_URL']
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ['POSTGRESQL_URL']
 
 db = SQLAlchemy(app)
 
@@ -61,8 +61,8 @@ class Wishlist(db.Model):
     boxoffice = db.Column(db.String(200))
 
 # v1: SQLlite DB create tables
-with app.app_context():
-    db.create_all()
+# with app.app_context():
+#     db.create_all()
 
 # Make sure API key is set
 if not os.environ.get("API_KEY"):
@@ -419,10 +419,13 @@ def stats():
     basic_stats = []
     favorite = []
     favorite_with_img = []
+    favorite_with_img_2 = []
     others = []
     others_with_img = []
+    others_with_img_2 = []
     watch_next = []
     watch_next_with_img = []
+    watch_next_with_img_2 = []
     stats_list = list()
     stats_list_with_image = list()
     stats_list_with_image_2 = list()
@@ -441,8 +444,8 @@ def stats():
     
     # days since you last watched a movie
     results = find_most_recent_watch()
-    basic_stats.append({"question": "since you last watched a movie", 
-                        "answer": results + " Days"})
+    basic_stats.append({"question": "Days since you last watched a movie", 
+                        "answer": results})
     
     # number of wishlist items
     results = db.session.query(Wishlist).filter_by(user_id=session["user_id"]).count()
@@ -457,9 +460,15 @@ def stats():
         favorite_with_img.append({"question": "Your Favorite Movie",  
                                     "answer": results,
                                     "poster": poster[0]})
+    elif type(poster)== list and len(poster)==2:
+        favorite_with_img_2.append({"question": "Your Favorite Movie",  
+                                    "answer": results,
+                                    "poster_1": poster[0],
+                                    "poster_2": poster[1]})
     else:
         favorite.append({"question": "Your Favorite Movie",  
                                   "answer": results})
+        
 
     # movies you watched the most times
     results = most_watch()
@@ -468,6 +477,11 @@ def stats():
         favorite_with_img.append({"question": "You can't stop re-watching", 
                         "answer": results,
                         "poster": poster[0]})
+    elif type(poster)== list and len(poster)==2:
+        favorite_with_img_2.append({"question": "You can't stop re-watching",  
+                                    "answer": results,
+                                    "poster_1": poster[0],
+                                    "poster_2": poster[1]})
     else:
         favorite.append({"question": "You can't stop re-watching",  
                                   "answer": results})
@@ -495,6 +509,11 @@ def stats():
         others_with_img.append({"question": "Most popular movie you have watched",  
                                     "answer": results,
                                     "poster": poster[0]})
+    elif type(poster)== list and len(poster)==2:
+        others_with_img_2.append({"question": "Most popular movie you have watched",  
+                                    "answer": results,
+                                    "poster_1": poster[0],
+                                    "poster_2": poster[1]})
     else:
         others.append({"question": "Most popular movie you have watched",  
                                   "answer": results})
@@ -506,6 +525,11 @@ def stats():
         others_with_img.append({"question": "Highest IMDb rating movie you have watched",  
                                     "answer": results,
                                     "poster": poster[0]})
+    elif type(poster)== list and len(poster)==2:
+        others_with_img_2.append({"question": "Highest IMDb rating movie you have watched",  
+                                    "answer": results,
+                                    "poster_1": poster[0],
+                                    "poster_2": poster[1]})
     else:
         others.append({"question": "Highest IMDb rating movie you have watched",  
                                   "answer": results})
@@ -517,6 +541,11 @@ def stats():
         others_with_img.append({"question": "Movie you love way more than other people",  
                                     "answer": results,
                                     "poster": poster[0]})
+    elif type(poster)== list and len(poster)==2:
+        others_with_img_2.append({"question": "Movie you love way more than other people",  
+                                    "answer": results,
+                                    "poster_1": poster[0],
+                                    "poster_2": poster[1]})
     else:
         others.append({"question": "Movie you love way more than other people",  
                                   "answer": results})
@@ -528,6 +557,11 @@ def stats():
         others_with_img.append({"question": "The most overrated movie you think",  
                                     "answer": results,
                                     "poster": poster[0]})
+    elif type(poster)== list and len(poster)==2:
+        others_with_img_2.append({"question": "The most overrated movie you think",  
+                                    "answer": results,
+                                    "poster_1": poster[0],
+                                    "poster_2": poster[1]})
     else:
         others.append({"question": "The most overrated movie you think",  
                                   "answer": results})
@@ -541,6 +575,11 @@ def stats():
         watch_next_with_img.append({"question": "Some old fashion",  
                                     "answer": results,
                                     "poster": poster[0]})
+    elif type(poster)== list and len(poster)==2:
+        watch_next_with_img_2.append({"question": "Some old fashion",  
+                                    "answer": results,
+                                    "poster_1": poster[0],
+                                    "poster_2": poster[1]})
     else:
         watch_next.append({"question": "Some old fashion",  
                                   "answer": results})
@@ -552,6 +591,11 @@ def stats():
         watch_next_with_img.append({"question": "Highest rating",  
                                     "answer": results,
                                     "poster": poster[0]})
+    elif type(poster)== list and len(poster)==2:
+        watch_next_with_img_2.append({"question": "Highest rating",  
+                                    "answer": results,
+                                    "poster_1": poster[0],
+                                    "poster_2": poster[1]})
     else:
         watch_next.append({"question": "Highest rating",  
                                   "answer": results})
@@ -563,6 +607,11 @@ def stats():
         watch_next_with_img.append({"question": "Most popular",  
                                     "answer": results,
                                     "poster": poster[0]})
+    elif type(poster)== list and len(poster)==2:
+        watch_next_with_img_2.append({"question": "Most popular",  
+                                    "answer": results,
+                                    "poster_1": poster[0],
+                                    "poster_2": poster[1]})
     else:
         watch_next.append({"question": "Most popular",  
                                   "answer": results})    
@@ -573,11 +622,29 @@ def stats():
         watch_next_with_img.append({"question": "Something new",  
                                     "answer": results,
                                     "poster": poster[0]})
+    elif type(poster)== list and len(poster)==2:
+        watch_next_with_img_2.append({"question": "Something new",  
+                                    "answer": results,
+                                    "poster_1": poster[0],
+                                    "poster_2": poster[1]})
     else:
         watch_next.append({"question": "Something new",  
                                   "answer": results})
     
-    return render_template("dashboard_cards.html", basic_stats=basic_stats, favorite=favorite, favorite_with_img=favorite_with_img, others=others, others_with_img=others_with_img, watch_next=watch_next, watch_next_with_img=watch_next_with_img, stats=stats_list, stats_img=stats_list_with_image, stats_img_2=stats_list_with_image_2)
+    return render_template("dashboard_cards.html", 
+                           basic_stats=basic_stats, 
+                           favorite=favorite, 
+                           favorite_with_img=favorite_with_img, 
+                           favorite_with_img_2=favorite_with_img_2,
+                           others=others, 
+                           others_with_img=others_with_img, 
+                           others_with_img_2=others_with_img_2,
+                           watch_next=watch_next, 
+                           watch_next_with_img=watch_next_with_img, 
+                           watch_next_with_img_2=watch_next_with_img_2,
+                           stats=stats_list, 
+                           stats_img=stats_list_with_image, 
+                           stats_img_2=stats_list_with_image_2)
 
 def find_highest(table, metric):
     results = list()
