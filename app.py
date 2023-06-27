@@ -104,7 +104,7 @@ def login():
         session["user_id"] = rows.id
 
         # Redirect user to home page
-        return redirect("/")
+        return redirect("/search")
 
     # User reached route via GET (as by clicking a link or via redirect)
     else:
@@ -411,102 +411,173 @@ def poster_wall():
         if poster not in poster_list:
             poster_list.append(poster)
 
-    #TODO: this will cause trouble for new user just registered
     return render_template("poster_wall.html", poster_list=poster_list)
 
 @app.route("/stats", methods=["GET"])
 @login_required
 def stats():
+    basic_stats = []
+    favorite = []
+    favorite_with_img = []
+    others = []
+    others_with_img = []
+    watch_next = []
+    watch_next_with_img = []
     stats_list = list()
     stats_list_with_image = list()
+    stats_list_with_image_2 = list()
+    # Basic stats
     # total movies watched
     results = db.session.query(Watch_history).filter_by(user_id=session["user_id"]).count()
-    stats_list.append({"question": "Total records in Watch History", 
+    basic_stats.append({"question": "Movies in your Watch History", 
                         "answer": results})
     
-    # unique movies watched
-    results = db.session.query(Watch_history.movie_id).filter_by(user_id=session["user_id"]).distinct().count()
-    stats_list.append({"question": "Number of unique movies you have watched", 
-                        "answer": results})
-    
-    # number of wishlist items
-    results = db.session.query(Wishlist).filter_by(user_id=session["user_id"]).count()
-    stats_list.append({"question": "Number of movies in Wishlist", 
-                        "answer": results})
-    
-    # movies with the highest IMDB rating in your wishlist
-    results = find_highest(Wishlist, "imdb_rating")
-    stats_list.append({"question": "Most highly rated movie you want to watch", 
-                        "answer": results})
-    
-    # wishlist with the highest box office
-    results = find_highest_box_office(Wishlist)
-    stats_list.append({"question": "Most popular movie you want to watch", 
-                        "answer": results})
-    
-    # movies with the highest personal rating
-    results = find_highest(Watch_history, "personal_rating")
-    stats_list_with_image.append({"question": "Movie you rated the highest",  
-                        "answer": results})
-
-    # watch history with the highest box office 
-    results = find_highest_box_office(Watch_history)
-    stats_list.append({"question": "Most popular movie you have watched", 
-                        "answer": results})
-
-    # watch history with the highest IMDB rating
-    results = find_highest(Watch_history, "imdb_rating")
-    stats_list.append({"question": "Highest IMDB rating movie you have watched", 
-                        "answer": results})
-
-    # movies you love more than imdb
-    results = compare_personal_rating_with_imdb("rate higher")
-    stats_list.append({"question": "Movie you love way more than others (IMDB)", 
-                        "answer": results})
-
-    # movies you under-rate
-    results = compare_personal_rating_with_imdb("rate lower")
-    stats_list.append({"question": "Movie you rate the lowest in comparison to others (IMDB)", 
-                        "answer": results})
-
-    # movies you watched the most times
-    results = most_watch()
-    stats_list.append({"question": "Movie you can't stop re-watching", 
-                        "answer": results})
-
     # number of movies you watched this year
     current_year = datetime.now().year
     results = Watch_history.query.filter(Watch_history.user_id==session["user_id"],
                                extract('year', Watch_history.watch_date) == current_year).count()
-    stats_list.append({"question": "Number of times you have watched movie this year", 
+    basic_stats.append({"question": "Movies you Watched This Year", 
                         "answer": results})
-
+    
     # days since you last watched a movie
-    # most_recent_movie = Watch_history.query.filter(Watch_history.user_id==session["user_id"],
-    #                                      Watch_history.watch_date <= datetime.now()).order_by(Watch_history.watch_date.desc()).first()
-    # date_diff = date.today() - most_recent_movie.watch_date
-    # date_diff = str(date_diff.days)
     results = find_most_recent_watch()
-    stats_list.append({"question": "Days since you last watched a movie", 
-                        "answer": results + " days"})
-
-    # oldest movie you have watched
-    results = find_oldest_movie()
-    stats_list.append({"question": "Oldest movie you have watched", 
+    basic_stats.append({"question": "since you last watched a movie", 
+                        "answer": results + " Days"})
+    
+    # number of wishlist items
+    results = db.session.query(Wishlist).filter_by(user_id=session["user_id"]).count()
+    basic_stats.append({"question": "Movies you want to watch", 
                         "answer": results})
 
+    # Personal Favorites
+    # movies with the highest personal rating
+    results = find_highest(Watch_history, "personal_rating")
+    poster = find_poster_url(results)
+    if type(poster)== list and len(poster)==1:
+        favorite_with_img.append({"question": "Your Favorite Movie",  
+                                    "answer": results,
+                                    "poster": poster[0]})
+    else:
+        favorite.append({"question": "Your Favorite Movie",  
+                                  "answer": results})
+
+    # movies you watched the most times
+    results = most_watch()
+    poster = find_poster_url(results)
+    if type(poster)== list and len(poster)==1:
+        favorite_with_img.append({"question": "You can't stop re-watching", 
+                        "answer": results,
+                        "poster": poster[0]})
+    else:
+        favorite.append({"question": "You can't stop re-watching",  
+                                  "answer": results})
+    
     # favorite genre
     results = find_favorite("genre")
-    stats_list.append({"question": "Your favorite genre", 
+    favorite.append({"question": "Your favorite genre", 
                         "answer": results})
     
     # favorite director
     results = find_favorite("director")
-    stats_list.append({"question": "Your favorite director", 
+    favorite.append({"question": "Your favorite director", 
                         "answer": results})
     
+    # unique movies watched
+    # results = db.session.query(Watch_history.movie_id).filter_by(user_id=session["user_id"]).distinct().count()
+    # stats_list.append({"question": "Number of unique movies you have watched", 
+    #                     "answer": results})
     
-    return render_template("dashboard_cards.html", stats=stats_list)
+    # Comparing to others
+    # watch history with the highest box office 
+    results = find_highest_box_office(Watch_history)
+    poster = find_poster_url(results)
+    if type(poster)== list and len(poster)==1:
+        others_with_img.append({"question": "Most popular movie you have watched",  
+                                    "answer": results,
+                                    "poster": poster[0]})
+    else:
+        others.append({"question": "Most popular movie you have watched",  
+                                  "answer": results})
+    
+    # watch history with the highest IMDB rating
+    results = find_highest(Watch_history, "imdb_rating")
+    poster = find_poster_url(results)
+    if type(poster)== list and len(poster)==1:
+        others_with_img.append({"question": "Highest IMDb rating movie you have watched",  
+                                    "answer": results,
+                                    "poster": poster[0]})
+    else:
+        others.append({"question": "Highest IMDb rating movie you have watched",  
+                                  "answer": results})
+
+    # movies you love more than imdb
+    results = compare_personal_rating_with_imdb("rate higher")
+    poster = find_poster_url(results)
+    if type(poster)== list and len(poster)==1:
+        others_with_img.append({"question": "Movie you love way more than other people",  
+                                    "answer": results,
+                                    "poster": poster[0]})
+    else:
+        others.append({"question": "Movie you love way more than other people",  
+                                  "answer": results})
+
+    # movies you under-rate
+    results = compare_personal_rating_with_imdb("rate lower")
+    poster = find_poster_url(results)
+    if type(poster)== list and len(poster)==1:
+        others_with_img.append({"question": "The most overrated movie you think",  
+                                    "answer": results,
+                                    "poster": poster[0]})
+    else:
+        others.append({"question": "The most overrated movie you think",  
+                                  "answer": results})
+
+
+    # Watch next
+    # oldest movie you have watched
+    results = find_oldest_or_newest_movie("old", Wishlist)
+    poster = find_poster_url(results)
+    if type(poster)== list and len(poster)==1:
+        watch_next_with_img.append({"question": "Some old fashion",  
+                                    "answer": results,
+                                    "poster": poster[0]})
+    else:
+        watch_next.append({"question": "Some old fashion",  
+                                  "answer": results})
+
+    # movies with the highest IMDB rating in your wishlist
+    results = find_highest(Wishlist, "imdb_rating")
+    poster = find_poster_url(results)
+    if type(poster)== list and len(poster)==1:
+        watch_next_with_img.append({"question": "Highest rating",  
+                                    "answer": results,
+                                    "poster": poster[0]})
+    else:
+        watch_next.append({"question": "Highest rating",  
+                                  "answer": results})
+        
+    # wishlist with the highest box office
+    results = find_highest_box_office(Wishlist)
+    poster = find_poster_url(results)
+    if type(poster)== list and len(poster)==1:
+        watch_next_with_img.append({"question": "Most popular",  
+                                    "answer": results,
+                                    "poster": poster[0]})
+    else:
+        watch_next.append({"question": "Most popular",  
+                                  "answer": results})    
+    
+    results = find_oldest_or_newest_movie("new", Wishlist)
+    poster = find_poster_url(results)
+    if type(poster)== list and len(poster)==1:
+        watch_next_with_img.append({"question": "Something new",  
+                                    "answer": results,
+                                    "poster": poster[0]})
+    else:
+        watch_next.append({"question": "Something new",  
+                                  "answer": results})
+    
+    return render_template("dashboard_cards.html", basic_stats=basic_stats, favorite=favorite, favorite_with_img=favorite_with_img, others=others, others_with_img=others_with_img, watch_next=watch_next, watch_next_with_img=watch_next_with_img, stats=stats_list, stats_img=stats_list_with_image, stats_img_2=stats_list_with_image_2)
 
 def find_highest(table, metric):
     results = list()
@@ -627,27 +698,35 @@ def most_watch():
     else:
         return results
     
-def find_oldest_movie():
+def find_oldest_or_newest_movie(option, table):
+    if option not in ["old", "new"]:
+        raise ValueError('option input should be either "old" or "new"')
     movie_pairs = {}
 
     all_movies = db.session.query(
-        Movies, Watch_history
+        Movies, table
     ).join(
-        Watch_history
+        table
     ).filter(
-        Watch_history.user_id==session["user_id"]
+        table.user_id==session["user_id"]
     ).all()
 
-    for movie, watch_history in all_movies:
+    for movie, list in all_movies:
         if movie.movie_id not in movie_pairs:
             movie_pairs[movie.movie_id] = movie.year
     
     if movie_pairs == {}:
-        return "You don't have any record in your Watch History"
+        if table == Watch_history:
+            return "You don't have any record in your Watch History"
+        elif table == Wishlist:
+            return "You don't have any record in your Wishlist"
 
-    oldest_year = min(movie_pairs.values())
+    if option == "old":
+        year = min(movie_pairs.values())
+    elif option == "new":
+        year = max(movie_pairs.values())
 
-    results = [k for k, v in movie_pairs.items() if v == oldest_year]
+    results = [k for k, v in movie_pairs.items() if v == year]
 
     return results
 
@@ -679,7 +758,7 @@ def find_favorite(option):
 
     results = [k for k, v in movie_pairs.items() if v == favorite]
 
-    if len(results) > 3:
+    if len(results) > 5:
         return "Too many "+ option + " tie as your favorite "+ option
     else:
         return results
@@ -698,6 +777,16 @@ def find_most_recent_watch():
     date_diff = date.today() - most_recent_movie.watch_date
     date_diff = str(date_diff.days)
     return date_diff
+
+def find_poster_url(results):
+    if type(results) == list:
+        url_list = []
+        for movie in results:
+            movie_info = Movies.query.filter(Movies.movie_id==movie).first()
+            url_list.append(movie_info.poster_url)
+        return url_list
+    else:
+        return 0
 
 # @app.route("/add_movie", methods=["GET", "POST"])
 # @login_required

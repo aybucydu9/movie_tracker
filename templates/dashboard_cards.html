@@ -1,0 +1,130 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Stats Dashboard
+{% endblock %}
+
+{% block main %}
+
+<div class="row">
+    {% for record in basic_stats %}
+        <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+            <h5 class="card-title">{{ record.answer }}</h5>
+            <p class="card-text">{{ record.question }}</p>
+            <!--<a href="#" class="btn btn-primary">Go somewhere</a>-->
+            </div>
+        </div>
+        </div>
+    {% endfor %}
+
+    
+    <div class="card">
+        <div class="card-body">
+        <h5 class="card-title">Your favorites</h5>
+        </div>
+    </div>
+    
+
+    {% for record in favorite_with_img %}
+        <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+            <h5 class="card-title">{{ record.question }}</h5>
+            <img src="{{ record.poster }}" class="card-img-top" alt="...">
+            </div>
+        </div>
+        </div>
+    {% endfor %}
+
+    {% for record in favorite %}
+        <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+            <h5 class="card-title">{{ record.question }}</h5>
+            <p class="card-text">{{ record.answer }}</p>
+            </div>
+        </div>
+        </div>
+    {% endfor %}
+
+    <div class="card">
+        <div class="card-body">
+        <h5 class="card-title">Based on your watch history</h5>
+        </div>
+    </div>
+
+    {% for record in others_with_img %}
+        <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+            <h5 class="card-title">{{ record.question }}</h5>
+            <img src="{{ record.poster }}" class="card-img-top" alt="...">
+            </div>
+        </div>
+        </div>
+    {% endfor %}
+
+    {% for record in others %}
+        <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+            <h5 class="card-title">{{ record.question }}</h5>
+            <p class="card-text">{{ record.answer }}</p>
+            </div>
+        </div>
+        </div>
+    {% endfor %}
+
+    <div class="">
+        <div class="card">
+            <div class="card-body">
+            <h5 class="card-title">What to watch next</h5>
+            </div>
+        </div>
+    </div>
+    
+    {% for record in watch_next_with_img %}
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                <h5 class="card-title">{{ record.question }}</h5>
+                <img src="{{ record.poster }}" class="card-img-top" alt="...">
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    {% for record in watch_next %}
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                <h5 class="card-title">{{ record.question }}</h5>
+                <p class="card-text">{{ record.answer }}</p>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    {% for record in stats_img_2 %}
+        <div class="col-sm-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ record.question }}</h5>
+                    <p class="card-text">{{ record.answer }}</p>
+                    <div class="row g-0">
+                    <div class="col-sm-6">
+                        <img src="{{ record.poster_1 }}" class="img-fluid" alt="...">
+                    </div>
+                    <div class="col-sm-6">
+                        <img src="{{ record.poster_2 }}" class="img-fluid" alt="...">
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+{% endblock %}
