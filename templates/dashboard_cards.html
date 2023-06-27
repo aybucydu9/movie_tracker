@@ -8,6 +8,14 @@
 {% block main %}
 
 <div class="row">
+
+    <div class="card bg-dark text-white">
+        <div class="card-body">
+            <h5 class="card-title">The Stats</h5>
+        </div>
+    </div>
+    <div class="mb-2"></div>
+
     {% for record in basic_stats %}
         <div class="col-xl-3 col-md-6 mb-4">
         <div class="card border-left-primary shadow h-100 py-2">
@@ -21,15 +29,16 @@
     {% endfor %}
 
     
-    <div class="card">
+    <div class="card mx3 bg-danger text-white">
         <div class="card-body">
-        <h5 class="card-title">Your favorites</h5>
+        <h5 class="card-title">Your Favorites</h5>
         </div>
     </div>
+    <div class="mb-2"></div>
     
 
     {% for record in favorite_with_img %}
-        <div class="col-xl-3 col-md-6 mb-4">
+        <div class="col-xl-3 col-md-5 mb-4">
         <div class="card border-left-primary shadow h-100 py-2">
             <div class="card-body">
             <h5 class="card-title">{{ record.question }}</h5>
@@ -50,11 +59,12 @@
         </div>
     {% endfor %}
 
-    <div class="card">
+    <div class="card bg-warning text-white">
         <div class="card-body">
-        <h5 class="card-title">Based on your watch history</h5>
+        <h5 class="card-title">Based on Your Watch History</h5>
         </div>
     </div>
+    <div class="mb-2"></div>
 
     {% for record in others_with_img %}
         <div class="col-xl-3 col-md-6 mb-4">
@@ -78,13 +88,14 @@
         </div>
     {% endfor %}
 
-    <div class="">
-        <div class="card">
-            <div class="card-body">
-            <h5 class="card-title">What to watch next</h5>
-            </div>
+    
+    <div class="card bg-secondary text-white">
+        <div class="card-body">
+        <h5 class="card-title">What to Watch Next</h5>
         </div>
     </div>
+
+    <div class="mb-2"></div>
     
     {% for record in watch_next_with_img %}
         <div class="col-xl-3 col-md-6 mb-4">
