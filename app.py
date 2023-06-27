@@ -786,7 +786,7 @@ def find_oldest_or_newest_movie(option, table):
         if table == Watch_history:
             return "You don't have any record in your Watch History"
         elif table == Wishlist:
-            return "You don't have any record in your Wishlist"
+            return "You don't have any record in your Wish List"
 
     if option == "old":
         year = min(movie_pairs.values())
