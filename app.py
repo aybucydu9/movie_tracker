@@ -21,7 +21,7 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 # v1: Configure SQLlite DB
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///movies_sqlite.db"
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///movies_sqlite.db" #TODO
 
 # v2: Config for Heroku
 #app.config["SQLALCHEMY_DATABASE_URI"] = os.environ['POSTGRESQL_URL']
@@ -104,7 +104,7 @@ def login():
         session["user_id"] = rows.id
 
         # Redirect user to home page
-        return redirect("/search")
+        return redirect("/")
 
     # User reached route via GET (as by clicking a link or via redirect)
     else:
