@@ -31,11 +31,11 @@
                 <div class="collapse navbar-collapse" id="navbar">
                     {% if session["user_id"] %}
                         <ul class="navbar-nav me-auto mt-2">
-                            <li class="nav-item"><a class="nav-link" href="/search">Search for Movies</a></li>
-                            <li class="nav-item"><a class="nav-link" href="/history">My Watch History</a></li>
-                            <li class="nav-item"><a class="nav-link" href="/wishlist">My Wish List</a></li>
-                            <li class="nav-item"><a class="nav-link" href="/posterwall">My Poster Wall</a></li>
-                            <li class="nav-item"><a class="nav-link" href="/stats">My Dashboard</a></li>
+                            <li class="nav-item"><a class="nav-link {{ 'active' if active_page == 'search' else '' }}" href="/search">Search for Movies</a></li>
+                            <li class="nav-item"><a class="nav-link {{ 'active' if active_page == 'history' else '' }}" href="/history">My Watch History</a></li>
+                            <li class="nav-item"><a class="nav-link {{ 'active' if active_page == 'wishlist' else '' }}" href="/wishlist">My Wish List</a></li>
+                            <li class="nav-item"><a class="nav-link {{ 'active' if active_page == 'posterwall' else '' }}" href="/posterwall">My Poster Wall</a></li>
+                            <li class="nav-item"><a class="nav-link {{ 'active' if active_page == 'stats' else '' }}" href="/stats">My Dashboard</a></li>
                         </ul>
                         <ul class="navbar-nav ms-auto mt-2">
                             <li class="nav-item"><a class="nav-link" href="/logout">Log Out</a></li>
