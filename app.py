@@ -828,7 +828,14 @@ def find_favorite(option):
     if len(results) > 5:
         return "Too many "+ option + " tie as your favorite "+ option
     else:
-        return results
+        results_str = ""
+        for i in range(len(results)):
+            if i == 0:
+                results_str = results_str + results[i]
+            else:
+                results_str = results_str + ", " + results[i]
+        return results_str
+        #return results
     
 def find_most_recent_watch():
     most_recent_movie = Watch_history.query.filter(
